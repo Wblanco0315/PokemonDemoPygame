@@ -12,7 +12,6 @@ class Player(pygame.sprite.Sprite):
         sprite_filename = "player_overworld.png"
         sprite_path = os.path.join(SPRITES_DIR, sprite_filename)
 
-        # Diccionario para guardar las tiras de imágenes
         self.animations = {
             'down': [],
             'left': [],
@@ -27,7 +26,6 @@ class Player(pygame.sprite.Sprite):
         try:
             # 1. Cargar y Escalar (Igual que antes)
             raw_sheet = pygame.image.load(sprite_path).convert_alpha()
-            # Escalar al 50% (de 64x64 a 32x32 por cuadro)
             new_width = raw_sheet.get_width() // 2
             new_height = raw_sheet.get_height() // 2
             full_sheet = pygame.transform.scale(raw_sheet, (new_width, new_height))

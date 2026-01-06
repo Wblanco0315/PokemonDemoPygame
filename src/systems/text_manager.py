@@ -1,17 +1,23 @@
 import json
+import os
 from src.config import *
 
 
 class TextManager:
-    def __init__(self, filename):
-        path = os.path.join("assets", "language", filename)
+    def __init__(self, filename="ES.json"):
+        path = os.path.join(ASSETS_DIR, "language", filename)
 
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 self.data = json.load(f)
+            print(f"DEBUG: Dialogos cargados desde {path}")
         except FileNotFoundError:
-            print(f"ERROR: No se encontro el archivo de diálogos en {path}")
+            print(f"ERROR CRÍTICO: No se encontró el archivo en {path}")
+            self.data = {}
+        except json.JSONDecodeError:
+            print(f"ERROR: El archivo {filename} tiene un formato JSON invalido.")
             self.data = {}
 
     def get_dialogue(self, dialogue_id):
-        return self.data.get(dialogue_id, ["...", f"Error: Falta ID '{dialogue_id}'"])
+        # Devuelve una lista con el error si no encuentra el ID, para que no crashee
+        return self.data.get(dialogue_id, [f"MISSING_ID: {dialogue_id}"])

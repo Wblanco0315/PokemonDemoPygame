@@ -9,13 +9,37 @@ class Npc(pygame.sprite.Sprite):
         self.grid_y = y
         self.dialogue_id = dialogue_id
 
-        try:
-            path = os.path.join(SPRITES_DIR, sprite_filename)
-            self.image = pygame.image.load(path).convert_alpha()
+        self.animations = {
+            'down': [],
+            'left': [],
+            'right': [],
+            'up': []
+        }
 
-            # Escalado simple si es muy grande
-            if self.image.get_width() > 32:
-                self.image = pygame.transform.scale(self.image, (32, 32))
+        self.direction = 'down'  # Direccion default
+
+        try:
+            sprite_path = os.path.join(SPRITES_DIR, sprite_filename)
+            # 1. Cargar y Escalar (Igual que antes)
+            raw_sheet = pygame.image.load(sprite_path).convert_alpha()
+            new_width = raw_sheet.get_width() // 2
+            new_height = raw_sheet.get_height() // 2
+            full_sheet = pygame.transform.scale(raw_sheet, (new_width, new_height))
+
+            directions_list = ['down', 'left', 'right', 'up']
+
+            for row_index, anim_name in enumerate(directions_list):
+                for col_index in range(4):  # 4 frames por animación
+                    x_pos = col_index * 32
+                    y_pos = row_index * 32
+
+                    # Recortamos el cuadro
+                    frame = full_sheet.subsurface((x_pos, y_pos, 32, 32))
+                    self.animations[anim_name].append(frame)
+
+            # Imagen inicial
+            self.image = self.animations['down'][0]
+
         except Exception:
             self.image = pygame.Surface((TILE_SIZE, TILE_SIZE + 8))
             self.image.fill((0, 255, 0))  # Placeholder verde
