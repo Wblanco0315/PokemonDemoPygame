@@ -2,7 +2,7 @@ import pygame
 import sys
 from src.config import *
 from src.entities.roark import Roark
-from src.systems import MapManager, Camera, DialogueManager
+from src.systems import MapManager, Camera, DialogueManager, TextManager
 from src.entities.player import Player
 
 
@@ -17,6 +17,7 @@ class Game:
         # Inicializar Sistemas
         self.map_manager = MapManager("mapa_test.tmx")  # Cargar mapa
         self.camera = Camera(self.map_manager.width, self.map_manager.height)  # Inicializar cámara
+        self.text_manager = TextManager() # Cargar dialogos
         self.dialogue_manager = DialogueManager()  # Inicializar sistema de dialogos
 
         # Inicializar Entidades
@@ -66,18 +67,14 @@ class Game:
         pygame.display.flip()
 
     def check_interaction(self):
-        # 1. SI EL DIÁLOGO YA ESTÁ ABIERTO -> Avanzamos texto
+
         if self.dialogue_manager.active:
             self.dialogue_manager.advance()
             return
 
-        # 2. CALCULAR COORDENADAS (Esto te faltaba) <--- CORREGIDO
         # Calculamos dónde está el jugador en la grilla
         player_grid_x = int(self.player.rect.centerx // TILE_SIZE)
-        player_grid_y = int(self.player.rect.centery // TILE_SIZE)  # O usa bottom con ajuste
-
-        # Ajuste fino (opcional, depende de tu sprite):
-        # player_grid_y = int((self.player.rect.bottom - 1) // TILE_SIZE)
+        player_grid_y = int(self.player.rect.centery // TILE_SIZE)
 
         target_x = player_grid_x
         target_y = player_grid_y
@@ -92,13 +89,11 @@ class Game:
         elif self.player.direction == 'down':
             target_y += 1
 
-        # 3. BUSCAR NPC
         for npc in self.npcs:
-            # Comparamos coordenadas (convertimos a int por seguridad)
             if int(npc.grid_x) == target_x and int(npc.grid_y) == target_y:
-                lines = npc.interact()
-                if lines:
-                    self.dialogue_manager.start_dialogue(lines)
+                dialogue_id = npc.dialogue_id
+                lines = self.text_manager.get_dialogue(dialogue_id)
+                self.dialogue_manager.start_dialogue(lines)
                 return
 
     def run(self):
