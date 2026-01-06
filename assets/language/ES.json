@@ -1,0 +1,39 @@
+{
+  "roark_intro": [
+    "Asi es, ese soy yo.",
+    "¡Hola! Soy Roark, el líder de Ciudad Pirita.",
+    "Me has encontrado ocupado",
+    "Pero nunca es mal momento para un combate Pokémon.",
+    "Preparate...",
+    "Mis Pokémon de roca son duros como el acero.",
+    "¡Demuéstrame tu fuerza!"
+  ],
+  "roark_win": [
+    "¡Jajaja! Aún te falta entrenamiento.",
+    "Vuelve cuando seas más fuerte."
+  ],
+  "roark_defeat": [
+    "¡Increíble!",
+    "Has logrado romper mi defensa.",
+    "Toma, te mereces la Medalla Carbón."
+  ],
+  "player_start": [
+    "Uhmmmm...",
+    "Se supone que Roark debía estar aquí.",
+    "¿Dónde se habrá metido?",
+    "Supongo que seguire el camino hacia el norte."
+  ],
+  "player_before_battle": [
+    "Disculpa, ¿eres Roark?"
+  ],
+  "player_after_roark": [
+    "¡Vaya! ¡He ganado mi primera medalla!",
+    "¡Estoy un paso más cerca de ser un Maestro Pokémon!"
+  ],
+  "sys_save": [
+    "Guardando la partida..."
+  ],
+  "sys_error": [
+    "¡No puedes usar eso aquí!"
+  ]
+}
