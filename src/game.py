@@ -2,7 +2,8 @@ import pygame
 import sys
 from src.config import *
 from src.entities import Player, Roark, Pokemon
-from src.systems import MapManager, Camera, DialogueManager, TextManager, BattleManager, DataManager, MenuManager
+from src.systems import MapManager, Camera, DialogueManager, TextManager, BattleManager, DataManager, MenuManager, \
+    TitleManager
 
 
 class Game:
@@ -38,6 +39,7 @@ class Game:
 
         # MENU DE JUGADOR
         self.menu_manager = MenuManager(self.player)
+        self.title_manager = TitleManager()
 
         # COLISIONES
         self.map_manager.walls.append(lider_gimnasio.rect)
@@ -62,6 +64,11 @@ class Game:
                 print(f"DEBUG: Roark obtuvo a {new_poke.name}")
 
     def update(self):
+
+        if self.title_manager.active:
+            self.title_manager.update()
+            return
+
         if self.battle_manager.active:
             self.battle_manager.update()
             return
@@ -75,13 +82,19 @@ class Game:
         self.camera.update(self.player)
 
     def draw(self):
-        # LÓGICA DE BATALLA
-        if self.battle_manager.active:
+        # 1. PANTALLA DE TITULO
+        if self.title_manager.active:
+            self.title_manager.draw(self.virtual_surface)
+
+        # 2. BATALLA
+        elif self.battle_manager.active:
             self.battle_manager.draw(self.virtual_surface)
-        # MENÚ
+
+        # 3. MENÚ
         elif self.menu_manager.active:
             self.menu_manager.draw(self.virtual_surface)
 
+        # 4. JUEGO NORMAL
         else:
             self.virtual_surface.fill(BLACK)
             offset_x = self.camera.camera.x
@@ -100,7 +113,6 @@ class Game:
         # ESCALAR A PANTALLA COMPLETA
         scaled_surface = pygame.transform.scale(self.virtual_surface, (WINDOW_WIDTH, WINDOW_HEIGHT))
         self.screen.blit(scaled_surface, (0, 0))
-
         pygame.display.flip()
 
     # COMPROBAR INTERACCION CON NPCS
@@ -139,6 +151,10 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+
+                if self.title_manager.active:
+                    self.title_manager.handle_input(event)
+                    continue
 
                 if self.battle_manager.active:
                     self.battle_manager.handle_input(event)
