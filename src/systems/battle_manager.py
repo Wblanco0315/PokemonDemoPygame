@@ -10,6 +10,7 @@ class BattleManager:
         self.state = "MENU"  # MENU | ATTACK_SELECT | ANIMATION | END | SWITCH_POKEMON
         self.timer = 0
         self.turn_step = 0
+        self.winner = None
 
         # RECURSOS
         font_path = os.path.join(ASSETS_DIR, "fonts", "default_font.ttf")
@@ -281,11 +282,15 @@ class BattleManager:
 
             # PASO 7: VICTORIA
             elif self.turn_step == 7:
-                if self.timer > wait_time * 2: self.active = False
+                if self.timer > wait_time * 2:
+                    self.active = False
+                    self.winner = "PLAYER"
 
             # PASO 8: DERROTA
             elif self.turn_step == 8:
-                if self.timer > wait_time * 2: self.active = False
+                if self.timer > wait_time * 2:
+                    self.active = False
+                    self.winner = "ENEMY"
 
             # PASO 9: NUEVO ENEMIGO
             elif self.turn_step == 9:  # Nuevo enemigo
