@@ -26,8 +26,7 @@ class Game:
         self.menu_manager = MenuManager(None)
         self.title_manager = TitleManager()
         self.game_over_manager = GameOverManager()
-        # Variables de control
-        self.next_event = None
+        self.next_event = "PLAYER_START_DIALOGUE"
 
         # GRUPOS DE SPRITES
         self.all_sprites = pygame.sprite.Group()
@@ -93,8 +92,13 @@ class Game:
 
         self.camera.update(self.player)
 
+        if not self.dialogue_manager.active and self.next_event == "PLAYER_START_DIALOGUE":
+            lines = self.text_manager.get_dialogue("player_start")
+            self.dialogue_manager.start_dialogue(lines)
+            self.next_event = None
+
         # Evento: Inicio Batalla
-        if not self.dialogue_manager.active and self.next_event == "START_ROARK_BATTLE":
+        elif not self.dialogue_manager.active and self.next_event == "START_ROARK_BATTLE":
             self.battle_manager.start_battle(self.player.team, self.roark_team)
             self.next_event = "CHECK_BATTLE_RESULT"
 
