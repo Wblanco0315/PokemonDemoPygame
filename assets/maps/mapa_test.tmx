@@ -35,7 +35,7 @@
 17,18,17,18,17,18,17,273,274,275,276,277,278,18,17,18,17,18,17,18
 </data>
  </layer>
- <layer id="5" name="bottom_floor_decorations" width="20" height="30">
+ <layer id="5" name="bottom_floor_decorations" width="20" height="30" locked="1">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -69,7 +69,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="2" name="top_decorations" width="20" height="30">
+ <layer id="2" name="top_decorations" width="20" height="30" locked="1">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

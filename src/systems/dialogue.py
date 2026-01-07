@@ -4,53 +4,79 @@ from src.config import *
 
 class DialogueManager:
     def __init__(self):
-        self.active = False  # ¿Hay un diálogo abierto?
-        self.dialogue_lines = []  # Lista de frases a decir
-        self.current_line_index = 0  # Qué frase estamos mostrando
+        self.active = False
+        self.dialogue_lines = []
+        self.current_line_index = 0
 
-        # --- CONFIGURACIÓN VISUAL ---
-        # Caja de texto en la parte inferior
-        self.box_height = 60  # Altura de la caja (en pixeles virtuales)
+        self.box_height = 45
         self.box_rect = pygame.Rect(0, VIRTUAL_HEIGHT - self.box_height, VIRTUAL_WIDTH, self.box_height)
 
-        # Fuente (Usamos la default de Pygame por ahora, size 16 para GBA)
-        self.font = pygame.font.Font(None, 18)
+        try:
+            self.font = pygame.font.Font(FONTS_DIR, 8)
+        except FileNotFoundError:
+            print("ERROR: Fuente no encontrada")
+            self.font = pygame.font.Font(None, 12)
 
-        # Colores
-        self.bg_color = (40, 40, 50)  # Azul oscuro tipo Pokémon
-        self.border_color = (255, 255, 255)  # Borde blanco
+        self.bg_color = (40, 40, 50)
+        self.border_color = (255, 255, 255)
         self.text_color = (255, 255, 255)
 
+        # Margen interno del texto
+        self.padding = 8
+
     def start_dialogue(self, lines):
-        # Este método lo llamará el NPC cuando interactúes
         self.active = True
         self.dialogue_lines = lines
         self.current_line_index = 0
 
     def advance(self):
-        # Avanzar a la siguiente línea o cerrar si no hay más
         self.current_line_index += 1
         if self.current_line_index >= len(self.dialogue_lines):
-            self.active = False  # Cierra el diálogo
-            return False  # Indica que terminó
-        return True  # Indica que sigue hablando
+            self.active = False
+            return False
+        return True
 
     def draw(self, surface):
         if not self.active:
             return
 
-        # 1. DIBUJAR LA CAJA (Fondo y Borde)
+        # 1. DIBUJAR LA CAJA
         pygame.draw.rect(surface, self.bg_color, self.box_rect)
-        pygame.draw.rect(surface, self.border_color, self.box_rect, 2)  # Borde de 2px
+        pygame.draw.rect(surface, self.border_color, self.box_rect, 2)
 
-        # 2. RENDERIZAR TEXTO
+        # 2. PROCESAR EL TEXTO (WORD WRAP)
         # Obtenemos la frase actual
         text_content = self.dialogue_lines[self.current_line_index]
 
-        # Renderizar texto (True para antialias)
-        # Nota: En un sistema pro, haríamos text-wrapping (saltos de línea)
-        text_surface = self.font.render(text_content, False, self.text_color)
+        # Función rápida para dividir el texto en líneas que quepan
+        lines_to_draw = self.wrap_text(text_content, self.box_rect.width - (self.padding * 2))
 
-        # Posición del texto con un pequeño margen dentro de la caja
-        text_pos = (self.box_rect.x + 10, self.box_rect.y + 10)
-        surface.blit(text_surface, text_pos)
+        # 3. DIBUJAR LÍNEAS
+        y_offset = self.box_rect.y + self.padding
+
+        for line in lines_to_draw:
+            text_surface = self.font.render(line, False, self.text_color)
+            surface.blit(text_surface, (self.box_rect.x + self.padding, y_offset))
+            # Bajamos el cursor para la siguiente línea
+            y_offset += self.font.get_height() + 2
+
+    def wrap_text(self, text, max_width):
+        """Divide el texto en varias líneas si es muy largo"""
+        words = text.split(' ')
+        lines = []
+        current_line = ""
+
+        for word in words:
+            # Probamos si la línea actual + la nueva palabra entra en el ancho
+            test_line = current_line + word + " "
+            width, _ = self.font.size(test_line)
+
+            if width < max_width:
+                current_line = test_line
+            else:
+                # Si no entra, guardamos la línea actual y empezamos una nueva
+                lines.append(current_line)
+                current_line = word + " "
+
+        lines.append(current_line)  # Agregar la última línea
+        return lines

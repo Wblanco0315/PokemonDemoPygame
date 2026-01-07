@@ -1,0 +1,58 @@
+{
+    "tackle": {
+        "name": "Placaje",
+        "type": "normal",
+        "power": 40,
+        "accuracy": 100,
+        "pp": 35
+    },
+    "scratch": {
+        "name": "Arañazo",
+        "type": "normal",
+        "power": 40,
+        "accuracy": 100,
+        "pp": 35
+    },
+    "quick_attack": {
+        "name": "At. Rápido",
+        "type": "normal",
+        "power": 40,
+        "accuracy": 100,
+        "pp": 30
+    },
+    "vine_whip": {
+        "name": "Látigo Cepa",
+        "type": "grass",
+        "power": 45,
+        "accuracy": 100,
+        "pp": 25
+    },
+    "rock_throw": {
+        "name": "Lanzarrocas",
+        "type": "rock",
+        "power": 50,
+        "accuracy": 90,
+        "pp": 15
+    },
+    "mud_slap": {
+        "name": "Bofetón Lodo",
+        "type": "ground",
+        "power": 20,
+        "accuracy": 100,
+        "pp": 10
+    },
+    "bite": {
+        "name": "Mordisco",
+        "type": "normal",
+        "power": 60,
+        "accuracy": 100,
+        "pp": 25
+    },
+    "slam": {
+        "name": "Atizar",
+        "type": "normal",
+        "power": 80,
+        "accuracy": 75,
+        "pp": 20
+    }
+}

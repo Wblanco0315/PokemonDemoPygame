@@ -1,0 +1,62 @@
+{
+    "bulbasaur": {
+        "name": "Bulbasaur",
+        "type": "grass",
+        "base_hp": 45,
+        "base_attack": 49,
+        "base_defense": 49,
+        "moves": ["tackle", "vine_whip"],
+        "sprite_front": "bulbasaur.png",
+        "sprite_back": "bulbasaur.png"
+    },
+    "eevee": {
+        "name": "Eevee",
+        "type": "normal",
+        "base_hp": 55,
+        "base_attack": 55,
+        "base_defense": 50,
+        "moves": ["tackle", "quick_attack"],
+        "sprite_front": "eevee.png",
+        "sprite_back": "eevee.png"
+    },
+    "rattata": {
+        "name": "Rattata",
+        "type": "normal",
+        "base_hp": 30,
+        "base_attack": 56,
+        "base_defense": 35,
+        "moves": ["tackle", "bite"],
+        "sprite_front": "rattata.png",
+        "sprite_back": "rattata.png"
+    },
+    "geodude": {
+        "name": "Geodude",
+        "type": "rock",
+        "base_hp": 40,
+        "base_attack": 80,
+        "base_defense": 100,
+        "moves": ["tackle", "rock_throw"],
+        "sprite_front": "geodude.png",
+        "sprite_back": "geodude.png"
+    },
+    "diglett": {
+        "name": "Diglett",
+        "type": "ground",
+        "base_hp": 10,
+        "base_attack": 55,
+        "base_defense": 25,
+        "moves": ["scratch", "mud_slap"],
+        "sprite_front": "diglett.png",
+        "sprite_back": "diglett.png"
+    },
+    "onix": {
+        "name": "Onix",
+        "type": "rock",
+        "base_hp": 35,
+        "base_attack": 45,
+        "base_defense": 160,
+        "moves": ["tackle", "rock_throw", "slam"],
+        "sprite_front": "onix.png",
+        "sprite_back": "onix.png"
+    }
+}

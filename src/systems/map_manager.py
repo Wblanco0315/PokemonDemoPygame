@@ -1,6 +1,5 @@
 import pygame
 import pytmx
-import os
 from src.config import *
 
 class MapManager:

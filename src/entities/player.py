@@ -1,5 +1,4 @@
 import pygame
-import os
 from src.config import *
 
 
@@ -8,7 +7,6 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.map_manager = map_manager
 
-        # --- CONFIGURACIÓN DE ANIMACIÓN ---
         sprite_filename = "player_overworld.png"
         sprite_path = os.path.join(SPRITES_DIR, sprite_filename)
 
@@ -18,13 +16,15 @@ class Player(pygame.sprite.Sprite):
             'right': [],
             'up': []
         }
-        self.direction = 'up'  # Dirección actual
-        self.frame_index = 0  # Qué cuadro de la animación mostrar (0-3)
-        self.animation_speed = 0.21  # Velocidad del cambio (más bajo = más rápido)
-        self.animation_timer = 0  # Contador interno
+        self.direction = 'up'
+        self.frame_index = 0
+        self.animation_speed = 0.21
+        self.animation_timer = 0
+        self.player_name = "Lucas"
+        self.team = []
 
         try:
-            # 1. Cargar y Escalar (Igual que antes)
+
             raw_sheet = pygame.image.load(sprite_path).convert_alpha()
             new_width = raw_sheet.get_width() // 2
             new_height = raw_sheet.get_height() // 2
@@ -33,11 +33,10 @@ class Player(pygame.sprite.Sprite):
             directions_list = ['down', 'left', 'right', 'up']
 
             for row_index, anim_name in enumerate(directions_list):
-                for col_index in range(4):  # 4 frames por animación
+                for col_index in range(4):
                     x_pos = col_index * 32
                     y_pos = row_index * 32
 
-                    # Recortamos el cuadro
                     frame = full_sheet.subsurface((x_pos, y_pos, 32, 32))
                     self.animations[anim_name].append(frame)
 
@@ -49,14 +48,12 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
             self.image.fill((255, 0, 0))
 
-        # --- FÍSICA Y POSICIÓN ---
         self.rect = self.image.get_rect()
 
-        # Posición inicial
+
         target_bottom_y = (y + 1) * TILE_SIZE
         self.rect.midbottom = (x * TILE_SIZE + TILE_SIZE / 2, target_bottom_y)
 
-        # Hitbox Ajustada
         self.rect.width = 14
         self.rect.height = 10
         self.rect.midbottom = (x * TILE_SIZE + TILE_SIZE / 2, target_bottom_y)
@@ -77,7 +74,7 @@ class Player(pygame.sprite.Sprite):
             self.current_speed = PLAYER_SPEED
             self.animation_speed = 0.21
 
-        # Solo cambiamos 'self.direction' si se presiona una tecla
+        # Movimiento
         if keys[pygame.K_LEFT]:
             self.velocity.x = -self.current_speed
             self.direction = 'left'
@@ -107,27 +104,23 @@ class Player(pygame.sprite.Sprite):
                     self.rect.top = wall.bottom
 
     def animate(self):
-        # 1. ¿Nos estamos moviendo?
+
         is_moving = self.velocity.x != 0 or self.velocity.y != 0
 
         if is_moving:
-            # 2. Aumentar el timer
-            self.animation_timer += 0.05  # Ajusta este número si va muy lento/rápido
+            self.animation_timer += 0.05
 
-            # 3. Cambiar de frame si el timer supera la velocidad
             if self.animation_timer >= self.animation_speed:
                 self.animation_timer = 0
                 self.frame_index += 1
 
-                # Si llegamos al final (4), volver a empezar
                 if self.frame_index >= len(self.animations[self.direction]):
                     self.frame_index = 0
         else:
-            # Si está quieto, mostrar el frame 0 (parado) y resetear
+
             self.frame_index = 0
             self.animation_timer = 0
 
-        # 4. Actualizar la imagen actual según la dirección y el índice
         self.image = self.animations[self.direction][int(self.frame_index)]
 
     def update(self):
@@ -141,5 +134,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.velocity.y
         self.check_collisions('vertical')
 
-        # ANIMACIÓN (Nuevo paso vital)
+        # ANIMACIÓN
         self.animate()
+
+    def add_pokemon(self, pokemon):
+        if len(self.team) < 6:
+            self.team.append(pokemon)
+            print(f"¡Has obtenido a {pokemon.name}!")
+        else:
+            print("Tu equipo está lleno.")

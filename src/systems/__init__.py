@@ -2,3 +2,6 @@ from .map_manager import MapManager
 from .camera import Camera
 from .dialogue import DialogueManager
 from .text_manager import TextManager
+from .battle_manager import BattleManager
+from .config.data_manager import DataManager
+from .menu_manager import MenuManager
