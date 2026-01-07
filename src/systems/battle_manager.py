@@ -14,11 +14,11 @@ class BattleManager:
         # --- RECURSOS ---
         font_path = os.path.join(ASSETS_DIR, "fonts", "default_font.ttf")
         try:
-            self.font = pygame.font.Font(font_path, 8)
-            self.font_hp = pygame.font.Font(font_path, 8)
+            self.font = pygame.font.Font(font_path, 6)
+            self.font_hp = pygame.font.Font(font_path, 6)
         except:
-            self.font = pygame.font.Font(None, 12)
-            self.font_hp = pygame.font.Font(None, 12)
+            self.font = pygame.font.Font(None, 6)
+            self.font_hp = pygame.font.Font(None, 6)
 
         bg_path = os.path.join(ASSETS_DIR, "sprites", "backgrounds", "battle_background.png")
         try:
@@ -310,20 +310,33 @@ class BattleManager:
         else:
             surface.fill(self.color_bg)
 
-        # SPRITES
+        # 1. SPRITES
+        # Enemigo (Arriba Derecha)
         if self.enemy_pokemon and not self.enemy_pokemon.is_fainted:
             spr = self.enemy_pokemon.sprite_front
-            if spr: surface.blit(spr, (VIRTUAL_WIDTH - spr.get_width() - 20, 15))
+            if spr:
+                x = VIRTUAL_WIDTH - spr.get_width() + 3
+                y = -15
+                surface.blit(spr, (x, y))
 
+        # Jugador (Abajo Izquierda)
         if self.player_pokemon and not self.player_pokemon.is_fainted:
             spr = self.player_pokemon.sprite_back
-            if spr: surface.blit(spr, (30, VIRTUAL_HEIGHT - spr.get_height() - 40))
+            if spr:
+                x = 0
+                panel_height = 48
+                y = VIRTUAL_HEIGHT - panel_height - spr.get_height() + 20
+                surface.blit(spr, (x, y))
 
-        # UI
+        # 2. UI (Cajas de vida y Panel)
+        # Ajustamos las cajas de vida para que no tapen a los sprites
         if not self.enemy_pokemon.is_fainted:
-            self.draw_hp_box(surface, self.enemy_pokemon, 10, 10, True)
+            # Caja enemigo: Extremo izquierdo superior
+            self.draw_hp_box(surface, self.enemy_pokemon, 10, 8, True)
 
-        self.draw_hp_box(surface, self.player_pokemon, VIRTUAL_WIDTH - 110, VIRTUAL_HEIGHT - 70, False)
+        # Caja jugador: Extremo derecho, justo encima del panel de texto
+        self.draw_hp_box(surface, self.player_pokemon, VIRTUAL_WIDTH - 110, VIRTUAL_HEIGHT - 80, False)
+
         self.draw_ui_panel(surface)
 
     # --- MÉTODO MODIFICADO PARA MOSTRAR NIVEL Y HP ---

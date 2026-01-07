@@ -36,25 +36,21 @@ class Pokemon:
             return None
 
         path = os.path.join(SPRITES_DIR, "pokemon")
-
         if is_back:
             path = os.path.join(path, "back")
         else:
             path = os.path.join(path, "front")
-
         path = os.path.join(path, filename)
-
 
         try:
             image = pygame.image.load(path).convert_alpha()
-            # Escalamos x3 o x4 porque los sprites de GB son diminutos (64x64 aprox)
-            scale_factor = 3
+            scale_factor = 1
+
             w = image.get_width() * scale_factor
             h = image.get_height() * scale_factor
             return pygame.transform.scale(image, (w, h))
         except Exception as e:
             print(f"Error cargando sprite {filename}: {e}")
-            # Placeholder (Cuadrado de color si falla)
             surf = pygame.Surface((64, 64))
             surf.fill((255, 0, 255))
             return surf
