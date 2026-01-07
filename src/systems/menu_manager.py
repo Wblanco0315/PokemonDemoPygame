@@ -24,12 +24,12 @@ class MenuManager:
         self.active = True
         self.selected_index = 0
         self.swap_index = None
-        print("--- MENÚ ABIERTO ---")
 
     def close_menu(self):
         self.active = False
         self.swap_index = None
 
+    # MANEJO DE ENTRADAS DEL JUGADOR
     def handle_input(self, event):
         if not self.active:
             return
@@ -52,6 +52,7 @@ class MenuManager:
             else:
                 self.close_menu()
 
+    # INTERCAMBIAR POKEMON EN EL EQUIPO
     def swap_pokemon(self, i1, i2):
         self.player.team[i1], self.player.team[i2] = self.player.team[i2], self.player.team[i1]
 
@@ -59,17 +60,18 @@ class MenuManager:
         if not self.active:
             return
 
-        # 1. Fondo
+        # FONDO
         surface.fill(self.bg_color)
 
-        # 2. Título (Más pequeño y pegado arriba)
+        # TITULO
         title = self.font.render("EQUIPO (Z: Mover | X: Salir)", True, self.text_color)
         surface.blit(title, (10, 5))
 
-        # 3. Lista de Pokémon (Espaciado reducido)
-        start_y = 25  # Empezamos más arriba
-        row_height = 20  # Altura de cada fila (antes 40)
+        # LISTA DE POKEMON
+        start_y = 25  # POSICION INICIAL Y
+        row_height = 20  # ALTURA DE CADA FILA
 
+        # CARGAR LISTA DE POKEMON DEL JUGADOR
         for i, pokemon in enumerate(self.player.team):
             color = self.text_color
             prefix = " "
@@ -81,27 +83,27 @@ class MenuManager:
                 color = self.selected_color
                 prefix = ">"
 
-                # Dibujamos Mini Icono (Escalado a 16x16 para que quepa)
+            # DIBUJAMOS MINI ICONO
             icon_x = 10
             icon_y = start_y + i * row_height
 
             if pokemon.sprite_front:
-                # Usamos sprite_front para el icono
+                # USAMOS SPRITE_FRONT PARA EL ICONO
                 icon = pygame.transform.scale(pokemon.sprite_front, (16, 16))
                 surface.blit(icon, (icon_x, icon_y))
 
-            # Dibujamos Texto al lado del icono
+            # DIBUJAMOS TEXTO AL LADO DEL ICONO
             text_x = 35
-            # Ajuste de texto para compensar la posición del icono
+
             info = f"{prefix} {pokemon.name} N.{pokemon.level}"
 
-            # Barra de vida simple (texto)
+            # BARRA DE VIDA
             hp_info = f"{pokemon.current_hp}/{pokemon.max_hp}"
 
-            # Renderizamos nombre
+            # NOMBRE DEL POKEMON
             text_surf = self.font.render(info, True, color)
             surface.blit(text_surf, (text_x, icon_y + 2))
 
-            # Renderizamos HP a la derecha (alineado)
+            # RENDERIZAMOS HP A LA DERECHA
             hp_surf = self.font.render(hp_info, True, (200, 200, 200))
             surface.blit(hp_surf, (160, icon_y + 2))

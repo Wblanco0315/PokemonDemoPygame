@@ -11,7 +11,7 @@ class BattleManager:
         self.timer = 0
         self.turn_step = 0
 
-        # --- RECURSOS ---
+        # RECURSOS
         font_path = os.path.join(ASSETS_DIR, "fonts", "default_font.ttf")
         try:
             self.font = pygame.font.Font(font_path, 6)
@@ -27,14 +27,14 @@ class BattleManager:
         except:
             self.bg_image = None
 
-        # Colores
+        # COLORES
         self.color_bg = (20, 20, 30)
         self.color_ui_bg = (40, 40, 50)
         self.color_hp_high = (100, 255, 100)
         self.color_hp_mid = (255, 200, 50)
         self.color_hp_low = (255, 50, 50)
 
-        # Variables de combate
+        # VARIABLES DE COMBATE
         self.player_team = []
         self.enemy_team = []
         self.player_pokemon = None
@@ -42,7 +42,7 @@ class BattleManager:
         self.current_move = None
         self.message = ""
 
-        # UI Variables
+        # UI VARIABLES
         self.menu_option = 0
         self.move_option = 0
         self.switch_option = 0
@@ -76,7 +76,7 @@ class BattleManager:
         return sum(1 for p in team if not p.is_fainted)
 
     def calculate_damage(self, attacker, defender, move):
-        # 1. Efectividad
+        # 1. EFECTIVIDAD
         type_chart = {
             "fire": {"grass": 2.0, "water": 0.5, "rock": 0.5},
             "water": {"fire": 2.0, "grass": 0.5, "ground": 2.0, "rock": 2.0},
@@ -90,12 +90,12 @@ class BattleManager:
         attacker_chart = type_chart.get(move.type, {})
         multiplier = attacker_chart.get(defender.type, 1.0)
 
-        # 2. Formula
+        # 2. FORMULA
         level_factor = (2 * attacker.level / 5) + 2
         stat_ratio = attacker.attack / defender.defense
         base_damage = (level_factor * move.power * stat_ratio / 50) + 2
 
-        # 3. Variación
+        # 3. VARIACIÓN
         random_factor = random.uniform(0.85, 1.0)
         final_damage = int(base_damage * multiplier * random_factor)
         if final_damage < 1: final_damage = 1
@@ -115,7 +115,7 @@ class BattleManager:
         if event.type != pygame.KEYDOWN:
             return
 
-        # --- MENU PRINCIPAL ---
+        # MENU PRINCIPAL
         if self.state == "MENU":
             if event.key == pygame.K_RIGHT:
                 self.menu_option = (self.menu_option + 1) % 4
@@ -137,7 +137,7 @@ class BattleManager:
                 elif self.menu_option == 3:  # RUN
                     self.active = False
 
-        # --- SELECCIÓN ATAQUE ---
+        # SELECCIÓN ATAQUE
         elif self.state == "ATTACK_SELECT":
             num_moves = len(self.player_pokemon.moves)
             if num_moves == 0: return
@@ -159,7 +159,7 @@ class BattleManager:
                     self.state = "ANIMATION"
                     self.turn_step = 99
 
-        # --- SELECCIÓN DE POKEMON ---
+        # SELECCIÓN DE POKEMON
         elif self.state == "SWITCH_POKEMON":
             team_size = len(self.player_team)
 
@@ -195,7 +195,7 @@ class BattleManager:
             self.timer += 1
             wait_time = 45
 
-            # --- PASO 0: Texto Jugador ---
+            # PASO 0: TEXTO JUGADOR
             if self.turn_step == 0:
                 if self.timer == 1:
                     self.message = f"{self.player_pokemon.name} uso {self.current_move.name}!"
@@ -203,7 +203,7 @@ class BattleManager:
                     self.timer = 0
                     self.turn_step = 1
 
-            # --- PASO 1: Daño Jugador ---
+            # PASO 1: DAÑO JUGADOR
             elif self.turn_step == 1:
                 if self.timer == 1:
                     self.current_move.current_pp -= 1
@@ -218,7 +218,7 @@ class BattleManager:
                     else:
                         self.turn_step = 2
 
-            # --- PASO 2: Turno Enemigo (IA) ---
+            # PASO 2: TURNO ENEMIGO (IA)
             elif self.turn_step == 2:
                 if self.timer == 1:
                     if self.enemy_pokemon.moves:
@@ -232,7 +232,7 @@ class BattleManager:
                     self.timer = 0
                     self.turn_step = 3
 
-            # --- PASO 3: Daño Enemigo ---
+            # PASO 3: DAÑO ENEMIGO
             elif self.turn_step == 3:
                 if self.timer == 1:
                     dmg, ef_msg = self.calculate_damage(self.enemy_pokemon, self.player_pokemon, self.current_move)
@@ -247,7 +247,7 @@ class BattleManager:
                         self.state = "MENU"
                         self.message = "¿Qué debería hacer?"
 
-            # --- PASO 5: ENEMIGO DEBILITADO ---
+            # PASO 5: ENEMIGO DEBILITADO
             elif self.turn_step == 5:
                 if self.timer == 1:
                     self.message = f"¡{self.enemy_pokemon.name} se debilito!"
@@ -264,7 +264,7 @@ class BattleManager:
                         self.message = "¡Has derrotado al equipo enemigo!"
                         self.turn_step = 7
 
-            # --- PASO 6: JUGADOR DEBILITADO ---
+            # PASO 6: JUGADOR DEBILITADO
             elif self.turn_step == 6:
                 if self.timer == 1:
                     self.message = f"¡{self.player_pokemon.name} se debilito!"
@@ -279,19 +279,22 @@ class BattleManager:
                         self.message = "¡No te quedan Pokémon! Fin..."
                         self.turn_step = 8
 
-            # --- PASOS FINALES ---
-            elif self.turn_step == 7:  # Win
+            # PASO 7: VICTORIA
+            elif self.turn_step == 7:
                 if self.timer > wait_time * 2: self.active = False
 
-            elif self.turn_step == 8:  # Lose
+            # PASO 8: DERROTA
+            elif self.turn_step == 8:
                 if self.timer > wait_time * 2: self.active = False
 
+            # PASO 9: NUEVO ENEMIGO
             elif self.turn_step == 9:  # Nuevo enemigo
                 if self.timer > wait_time:
                     self.state = "MENU"
                     self.message = f"¡Adelante, {self.player_pokemon.name}!"
 
-            elif self.turn_step == 10:  # Nuevo jugador
+            # PASO 10: CAMBIO POKEMON JUGADOR
+            elif self.turn_step == 10:
                 if self.timer > wait_time:
                     self.timer = 0
                     if self.force_switch:
@@ -299,7 +302,7 @@ class BattleManager:
                         self.message = "¿Qué debería hacer?"
                     else:
                         self.turn_step = 2
-
+            # 99: ERROR PP
             elif self.turn_step == 99:  # Error PP
                 if self.timer > 30:
                     self.state = "ATTACK_SELECT"
@@ -311,7 +314,7 @@ class BattleManager:
             surface.fill(self.color_bg)
 
         # 1. SPRITES
-        # Enemigo (Arriba Derecha)
+        # ENEMIGO (ARRIBA DERECHA)
         if self.enemy_pokemon and not self.enemy_pokemon.is_fainted:
             spr = self.enemy_pokemon.sprite_front
             if spr:
@@ -319,7 +322,7 @@ class BattleManager:
                 y = -15
                 surface.blit(spr, (x, y))
 
-        # Jugador (Abajo Izquierda)
+        # JUGADOR (ABAJO IZQUIERDA)
         if self.player_pokemon and not self.player_pokemon.is_fainted:
             spr = self.player_pokemon.sprite_back
             if spr:
@@ -328,35 +331,35 @@ class BattleManager:
                 y = VIRTUAL_HEIGHT - panel_height - spr.get_height() + 20
                 surface.blit(spr, (x, y))
 
-        # 2. UI (Cajas de vida y Panel)
-        # Ajustamos las cajas de vida para que no tapen a los sprites
+        # 2. UI (CAJAS DE VIDA Y PANEL)
+        # AJUSTAMOS LAS CAJAS DE VIDA PARA QUE NO TAPEN A LOS SPRITES
         if not self.enemy_pokemon.is_fainted:
-            # Caja enemigo: Extremo izquierdo superior
+            # CAJA ENEMIGO: EXTREMO IZQUIERDO SUPERIOR
             self.draw_hp_box(surface, self.enemy_pokemon, 10, 8, True)
 
-        # Caja jugador: Extremo derecho, justo encima del panel de texto
+        # CAJA JUGADOR: EXTREMO DERECHO, JUSTO ENCIMA DEL PANEL DE TEXTO
         self.draw_hp_box(surface, self.player_pokemon, VIRTUAL_WIDTH - 110, VIRTUAL_HEIGHT - 80, False)
 
         self.draw_ui_panel(surface)
 
-    # --- MÉTODO MODIFICADO PARA MOSTRAR NIVEL Y HP ---
+    # MOSTRAR NIVEL Y HP
     def draw_hp_box(self, surface, pokemon, x, y, is_enemy):
         if not pokemon: return
         box_width, box_height = 100, 30
 
-        # Fondo y Borde
+        # FONDO Y BORDE
         pygame.draw.rect(surface, (240, 248, 240), (x, y, box_width, box_height))
         pygame.draw.rect(surface, (80, 80, 90), (x, y, box_width, box_height), 1)
 
-        # 1. NOMBRE (Izquierda)
+        # 1. NOMBRE (IZQUIERDA)
         name_t = self.font.render(f"{pokemon.name}", False, (0, 0, 0))
         surface.blit(name_t, (x + 5, y + 3))
 
-        # 2. NIVEL (Derecha) - AGREGADO
+        # 2. NIVEL (DERECHA)
         lvl_t = self.font.render(f"Nv:{pokemon.level}", False, (0, 0, 0))
         surface.blit(lvl_t, (x + box_width - 30, y + 3))
 
-        # Barra de vida
+        # BARRA DE VIDA
         bar_x, bar_y, bar_w, bar_h = x + 25, y + 18, 70, 4
         pct = pokemon.current_hp / pokemon.max_hp
         if pct < 0: pct = 0
@@ -366,7 +369,7 @@ class BattleManager:
         pygame.draw.rect(surface, (80, 80, 80), (bar_x, bar_y, bar_w, bar_h))
         pygame.draw.rect(surface, color, (bar_x, bar_y, fill_w, bar_h))
 
-        # 3. VIDA NUMÉRICA (Solo jugador)
+        # 3. VIDA NUMÉRICA (SOLO JUGADOR)
         if not is_enemy:
             hp_str = f"{int(pokemon.current_hp)}/{pokemon.max_hp}"
             surface.blit(self.font_hp.render(hp_str, False, (0, 0, 0)), (x + box_width - 45, y + 23))

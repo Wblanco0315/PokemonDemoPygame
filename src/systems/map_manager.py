@@ -6,6 +6,7 @@ class MapManager:
     def __init__(self, filename):
         tmx_path = os.path.join(MAPS_DIR, filename)
 
+        # CARGAR EL MAPA
         try:
             self.tmx_data = pytmx.util_pygame.load_pygame(tmx_path)
         except Exception as e:
@@ -13,7 +14,7 @@ class MapManager:
             print(f"Detalle: {e}")
             self.tmx_data = None
 
-        # Dimensiones del mapa
+        # DIMENSIONES DEL MAPA
         if self.tmx_data:
             self.width = self.tmx_data.width * self.tmx_data.tilewidth
             self.height = self.tmx_data.height * self.tmx_data.tileheight
@@ -23,6 +24,7 @@ class MapManager:
 
         self.image = self.render_map()
 
+        # CARGA DE COLISIONES
         self.walls = []
 
         if self.tmx_data:
@@ -49,8 +51,3 @@ class MapManager:
         offset_x = -camera_rect.x
         offset_y = -camera_rect.y
         surface.blit(self.image, (offset_x, offset_y))
-
-        # DEBUG: Dibuja cuadros rojos donde hay colisiones
-        for wall in self.walls:
-            rect_visual = wall.move(offset_x, offset_y)
-            pygame.draw.rect(surface, (255, 0, 0), rect_visual, 1)

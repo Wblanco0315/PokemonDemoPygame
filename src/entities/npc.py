@@ -16,11 +16,11 @@ class Npc(pygame.sprite.Sprite):
             'up': []
         }
 
-        self.direction = 'down'  # Direccion default
+        self.direction = 'down'  # DIRECCION DEFAULT
 
         try:
             sprite_path = os.path.join(SPRITES_DIR, sprite_filename)
-            # 1. Cargar y Escalar (Igual que antes)
+            # CARGAR Y ESCALAR
             raw_sheet = pygame.image.load(sprite_path).convert_alpha()
             new_width = raw_sheet.get_width() // 2
             new_height = raw_sheet.get_height() // 2
@@ -37,12 +37,12 @@ class Npc(pygame.sprite.Sprite):
                     frame = full_sheet.subsurface((x_pos, y_pos, 32, 32))
                     self.animations[anim_name].append(frame)
 
-            # Imagen inicial
+            # IMAGEN INICIAL
             self.image = self.animations['down'][0]
 
         except Exception:
             self.image = pygame.Surface((TILE_SIZE, TILE_SIZE + 8))
-            self.image.fill((0, 255, 0))  # Placeholder verde
+            self.image.fill((0, 255, 0))
 
         self.rect = self.image.get_rect()
         target_bottom_y = (y + 1) * TILE_SIZE

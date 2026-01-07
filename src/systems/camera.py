@@ -4,7 +4,7 @@ from src.config import *
 
 class Camera:
     def __init__(self, map_width, map_height):
-        # Necesitamos saber cuánto mide el mapa para no salirnos
+        # OBTENER TAMAÑO DEL MAPA
         self.camera = pygame.Rect(0, 0, map_width, map_height)
         self.map_width = map_width
         self.map_height = map_height
@@ -13,21 +13,17 @@ class Camera:
         return entity.rect.move(self.camera.topleft)
 
     def update(self, target):
-        # 1. Calcular la posición ideal (centrada en el jugador)
+        # CENTRAR CAMARA EN EL JUGADOR
         x = -target.rect.x + int(VIRTUAL_WIDTH / 2)
         y = -target.rect.y + int(VIRTUAL_HEIGHT / 2)
 
-        # 2. LIMITAR LA CÁMARA (Clamping)
-        # Límite Izquierdo (No pasar de 0)
+        # LIMITAR LA CÁMARA
         x = min(0, x)
-        # Límite Arriba (No pasar de 0)
         y = min(0, y)
 
-        # Límite Derecho (No mostrar lo negro más allá del ancho del mapa)
-        # La cámara no puede ir más allá de -(AnchoMapa - AnchoPantalla)
+        # LIMITE DERECHO (NO MOSTRAR LO NEGRO MÁS ALLÁ DEL ANCHO DEL MAPA)
         x = max(-(self.map_width - VIRTUAL_WIDTH), x)
-
-        # Límite Abajo (No mostrar lo negro más allá del alto del mapa)
+        # LIMITE ABAJO (NO MOSTRAR LO NEGRO MÁS ALLÁ DEL ALTO DEL MAPA)
         y = max(-(self.map_height - VIRTUAL_HEIGHT), y)
 
         self.camera = pygame.Rect(x, y, self.map_width, self.map_height)

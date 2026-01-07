@@ -1,15 +1,13 @@
 import json
-import os
 from src.config import *
 
 class DataManager:
     def __init__(self):
-        # Cargamos los diccionarios en memoria al iniciar el juego
+        # CARGAMOS LOS DICCIONARIOS EN MEMORIA AL INICIAR EL JUEGO
         self.pokedex = self.load_json("pokedex.json")
         self.moves = self.load_json("moves.json")
 
     def load_json(self, filename):
-        """Función auxiliar para cargar cualquier JSON de forma segura"""
         path = os.path.join(ASSETS_DIR, "data", filename)
         try:
             with open(path, 'r', encoding='utf-8') as f:
@@ -19,7 +17,7 @@ class DataManager:
             return {}
 
     def get_pokemon_data(self, species_id):
-        # Busca un pokémon (ej: 'charmander'). Si no existe, devuelve None.
+        # BUSCA UN POKÉMON (EJ: 'CHARMANDER'). SI NO EXISTE, DEVUELVE NONE.
         return self.pokedex.get(species_id)
 
     def get_move_data(self, move_id):

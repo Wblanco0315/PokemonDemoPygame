@@ -21,7 +21,7 @@ class DialogueManager:
         self.border_color = (255, 255, 255)
         self.text_color = (255, 255, 255)
 
-        # Margen interno del texto
+        # MARGEN INTERNO DEL TEXTO
         self.padding = 8
 
     def start_dialogue(self, lines):
@@ -40,43 +40,39 @@ class DialogueManager:
         if not self.active:
             return
 
-        # 1. DIBUJAR LA CAJA
+        # DIBUJAR LA CAJA
         pygame.draw.rect(surface, self.bg_color, self.box_rect)
         pygame.draw.rect(surface, self.border_color, self.box_rect, 2)
 
-        # 2. PROCESAR EL TEXTO (WORD WRAP)
-        # Obtenemos la frase actual
+        # PROCESAR EL TEXTO
         text_content = self.dialogue_lines[self.current_line_index]
 
-        # Función rápida para dividir el texto en líneas que quepan
+        # FUNCIÓN RÁPIDA PARA DIVIDIR EL TEXTO EN LÍNEAS QUE QUEPAN
         lines_to_draw = self.wrap_text(text_content, self.box_rect.width - (self.padding * 2))
 
-        # 3. DIBUJAR LÍNEAS
+        # DIBUJAR LÍNEAS
         y_offset = self.box_rect.y + self.padding
 
         for line in lines_to_draw:
             text_surface = self.font.render(line, False, self.text_color)
             surface.blit(text_surface, (self.box_rect.x + self.padding, y_offset))
-            # Bajamos el cursor para la siguiente línea
             y_offset += self.font.get_height() + 2
 
+    #  UNA FUNCIÓN PARA DIVIDIR EL TEXTO EN LINEAS
     def wrap_text(self, text, max_width):
-        """Divide el texto en varias líneas si es muy largo"""
         words = text.split(' ')
         lines = []
         current_line = ""
 
         for word in words:
-            # Probamos si la línea actual + la nueva palabra entra en el ancho
             test_line = current_line + word + " "
             width, _ = self.font.size(test_line)
 
             if width < max_width:
                 current_line = test_line
             else:
-                # Si no entra, guardamos la línea actual y empezamos una nueva
                 lines.append(current_line)
                 current_line = word + " "
 
-        lines.append(current_line)  # Agregar la última línea
+        lines.append(current_line)
         return lines

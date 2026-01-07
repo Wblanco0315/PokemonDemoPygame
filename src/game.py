@@ -8,6 +8,7 @@ from src.systems import MapManager, Camera, DialogueManager, TextManager, Battle
 class Game:
     def __init__(self):
         pygame.init()
+        # CONFIGURAR PANTALLA Y FRAME RATE
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.virtual_surface = pygame.Surface((VIRTUAL_WIDTH, VIRTUAL_HEIGHT))
         self.clock = pygame.time.Clock()
@@ -23,25 +24,27 @@ class Game:
 
         # GRUPOS DE SPRITES
         self.all_sprites = pygame.sprite.Group()
+
         # CREAR JUGADOR
         self.player = Player(9, 28, self.map_manager)
-
         self.all_sprites.add(self.player)
         self.npcs = pygame.sprite.Group()
 
-        # Crear a Roark
+        # CREAR A ROARK
         lider_gimnasio = Roark(9, 5)
         self.all_sprites.add(lider_gimnasio)
         self.npcs.add(lider_gimnasio)
         self.roark_team = []
 
+        # MENU DE JUGADOR
         self.menu_manager = MenuManager(self.player)
 
-        # Colisiones
+        # COLISIONES
         self.map_manager.walls.append(lider_gimnasio.rect)
 
+        # CARGAR POKEMON INICIALES
         team_ids = ["bulbasaur", "eevee", "rattata"]
-        roark_team_ids = ["geodude", "onix","diglett"]
+        roark_team_ids = ["geodude", "onix", "diglett"]
         for p_id in team_ids:
             p_data = self.data_manager.get_pokemon_data(p_id)
             if p_data:
@@ -72,31 +75,35 @@ class Game:
         self.camera.update(self.player)
 
     def draw(self):
-        # --- ESTADO DE BATALLA ---
+        # LÓGICA DE BATALLA
         if self.battle_manager.active:
             self.battle_manager.draw(self.virtual_surface)
-
+        # MENÚ
         elif self.menu_manager.active:
             self.menu_manager.draw(self.virtual_surface)
+
         else:
             self.virtual_surface.fill(BLACK)
-
             offset_x = self.camera.camera.x
             offset_y = self.camera.camera.y
+
+            # DIBUJAR MAPA
             self.virtual_surface.blit(self.map_manager.image, (offset_x, offset_y))
 
+            # DIBUJAR SPRITES
             for sprite in self.all_sprites:
                 offset_pos = (sprite.rect.x + offset_x, sprite.rect.y + offset_y)
                 self.virtual_surface.blit(sprite.image, offset_pos)
 
             self.dialogue_manager.draw(self.virtual_surface)
 
-        # 3. Escalar a pantalla completa (Común para ambos estados)
+        # ESCALAR A PANTALLA COMPLETA
         scaled_surface = pygame.transform.scale(self.virtual_surface, (WINDOW_WIDTH, WINDOW_HEIGHT))
         self.screen.blit(scaled_surface, (0, 0))
 
         pygame.display.flip()
 
+    # COMPROBAR INTERACCION CON NPCS
     def check_interaction(self):
         if self.dialogue_manager.active:
             self.dialogue_manager.advance()
@@ -126,6 +133,7 @@ class Game:
                     self.dialogue_manager.start_dialogue(lines)
                 return
 
+    # BUCLE PRINCIPAL DEL JUEGO Y GESTIÓN DE EVENTOS
     def run(self):
         while self.running:
             for event in pygame.event.get():

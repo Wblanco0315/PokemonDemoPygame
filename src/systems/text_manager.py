@@ -1,5 +1,4 @@
 import json
-import os
 from src.config import *
 
 
@@ -19,5 +18,4 @@ class TextManager:
             self.data = {}
 
     def get_dialogue(self, dialogue_id):
-        # Devuelve una lista con el error si no encuentra el ID, para que no crashee
         return self.data.get(dialogue_id, [f"MISSING_ID: {dialogue_id}"])
