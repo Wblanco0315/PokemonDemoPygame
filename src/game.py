@@ -2,18 +2,20 @@ import pygame
 import sys
 from src.config import *
 from src.entities import Player, Roark, Pokemon
-from src.systems import MapManager, Camera, DialogueManager, TextManager, BattleManager, DataManager, MenuManager, TitleManager
+from src.systems import *
 
 
 class Game:
     def __init__(self):
         pygame.init()
-        # CONFIGURAR PANTALLA Y FRAME RATE
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.virtual_surface = pygame.Surface((VIRTUAL_WIDTH, VIRTUAL_HEIGHT))
         self.clock = pygame.time.Clock()
         self.running = True
+        self.setup_game()
 
+    def setup_game(self):
+        print("--- INICIANDO/REINICIANDO JUEGO ---")
         # INICIAR SISTEMAS
         self.map_manager = MapManager("mapa_test.tmx")
         self.camera = Camera(self.map_manager.width, self.map_manager.height)
@@ -21,7 +23,11 @@ class Game:
         self.dialogue_manager = DialogueManager()
         self.battle_manager = BattleManager()
         self.data_manager = DataManager()
-        self.next_event = "PLAYER_START_DIALOGUE"
+        self.menu_manager = MenuManager(None)
+        self.title_manager = TitleManager()
+        self.game_over_manager = GameOverManager()
+        # Variables de control
+        self.next_event = None
 
         # GRUPOS DE SPRITES
         self.all_sprites = pygame.sprite.Group()
@@ -29,6 +35,9 @@ class Game:
         # CREAR JUGADOR
         self.player = Player(9, 28, self.map_manager)
         self.all_sprites.add(self.player)
+
+        # ACTUALIZAR MENU MANAGER CON EL JUGADOR REAL
+        self.menu_manager.player = self.player
         self.npcs = pygame.sprite.Group()
 
         # CREAR A ROARK
@@ -38,33 +47,35 @@ class Game:
         self.roark_team = []
         self.roark_defeated = False
 
-        # MENU DE JUGADOR
-        self.menu_manager = MenuManager(self.player)
-        self.title_manager = TitleManager()
-
         # COLISIONES
         self.map_manager.walls.append(lider_gimnasio.rect)
 
-        # CARGAR POKEMON INICIALES
+        # CARGAR POKEMON
+        self.load_teams()
+
+    def load_teams(self):
         team_ids = ["bulbasaur", "eevee", "rattata"]
         roark_team_ids = ["geodude", "onix", "diglett"]
+
         for p_id in team_ids:
             p_data = self.data_manager.get_pokemon_data(p_id)
             if p_data:
-                # Creamos el Pokemon
                 new_poke = Pokemon(p_id, p_data, self.data_manager.moves, level=10)
-                # Lo añadimos a la mochila
                 self.player.add_pokemon(new_poke)
-                print(f"DEBUG: {new_poke.name} añadido.")
 
         for p_id in roark_team_ids:
             p_data = self.data_manager.get_pokemon_data(p_id)
             if p_data:
                 new_poke = Pokemon(p_id, p_data, self.data_manager.moves, level=12)
                 self.roark_team.append(new_poke)
-                print(f"DEBUG: Roark obtuvo a {new_poke.name}")
 
     def update(self):
+
+        if self.game_over_manager.active:
+            if self.game_over_manager.restart_requested:
+                self.setup_game()
+                self.title_manager.active = False
+            return
 
         if self.title_manager.active:
             self.title_manager.update()
@@ -82,42 +93,49 @@ class Game:
 
         self.camera.update(self.player)
 
-        if not self.dialogue_manager.active and self.next_event == "PLAYER_START_DIALOGUE":
-            lines = self.text_manager.get_dialogue("player_start")
-            self.dialogue_manager.start_dialogue(lines)
-            self.next_event = None
-
+        # Evento: Inicio Batalla
         if not self.dialogue_manager.active and self.next_event == "START_ROARK_BATTLE":
             self.battle_manager.start_battle(self.player.team, self.roark_team)
             self.next_event = "CHECK_BATTLE_RESULT"
 
+        # Evento: Fin Batalla -> Diálogo Resultado
         elif not self.battle_manager.active and self.next_event == "CHECK_BATTLE_RESULT":
             if self.battle_manager.winner == "PLAYER":
                 self.roark_defeated = True
-                # Diálogo de victoria
-                lines = self.text_manager.get_dialogue("roark_defeat")
+                lines = self.text_manager.get_dialogue(
+                    "roark_defeat")  # Asegúrate que tu TextManager use get o get_dialogue
                 self.dialogue_manager.start_dialogue(lines)
             else:
-                # Diálogo de derrota
                 lines = self.text_manager.get_dialogue("roark_win")
                 self.dialogue_manager.start_dialogue(lines)
 
+            self.next_event = "WAIT_END_DIALOGUE"
+
+        # Evento: Fin Diálogo -> Pantalla Game Over
+        elif not self.dialogue_manager.active and self.next_event == "WAIT_END_DIALOGUE":
+            # Mostrar pantalla final
+            self.game_over_manager.show(self.battle_manager.winner)
             self.next_event = None
 
     def draw(self):
-        # 1. PANTALLA DE TITULO
-        if self.title_manager.active:
+
+        # PANTALLA DE  GAME OVER
+        if self.game_over_manager.active:
+            self.game_over_manager.draw(self.virtual_surface)
+
+        # PANTALLA DE TÍTULO
+        elif self.title_manager.active:
             self.title_manager.draw(self.virtual_surface)
 
-        # 2. BATALLA
+        # BATALLA
         elif self.battle_manager.active:
             self.battle_manager.draw(self.virtual_surface)
 
-        # 3. MENÚ
+        # MENÚ
         elif self.menu_manager.active:
             self.menu_manager.draw(self.virtual_surface)
 
-        # 4. JUEGO NORMAL
+        # JUEGO NORMAL
         else:
             self.virtual_surface.fill(BLACK)
             offset_x = self.camera.camera.x
@@ -161,32 +179,29 @@ class Game:
 
         for npc in self.npcs:
             if int(npc.grid_x) == target_x and int(npc.grid_y) == target_y:
-
-                # LÓGICA DE HISTORIA ROARK
                 if isinstance(npc, Roark):
                     if not self.roark_defeated:
-                        # 1. Combinar diálogos: Jugador pregunta + Roark responde
                         lines = self.text_manager.get_dialogue("player_before_battle") + self.text_manager.get_dialogue("roark_intro")
                         self.dialogue_manager.start_dialogue(lines)
-
-                        # 2. Programar batalla al terminar dialogo
                         self.next_event = "START_ROARK_BATTLE"
                     else:
                         lines = self.text_manager.get_dialogue("player_after_roark")
                         self.dialogue_manager.start_dialogue(lines)
-
                 else:
                     lines = npc.interact(self.text_manager)
                     if lines:
                         self.dialogue_manager.start_dialogue(lines)
                 return
 
-    # BUCLE PRINCIPAL DEL JUEGO Y GESTIÓN DE EVENTOS
     def run(self):
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+
+                if self.game_over_manager.active:
+                    self.game_over_manager.handle_input(event)
+                    continue
 
                 if self.title_manager.active:
                     self.title_manager.handle_input(event)
@@ -211,6 +226,7 @@ class Game:
 
                     if event.key == pygame.K_b:
                         self.battle_manager.start_battle(self.player.team, self.roark_team)
+                        self.next_event = "CHECK_BATTLE_RESULT"
 
             self.update()
             self.draw()
