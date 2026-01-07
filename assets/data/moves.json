@@ -23,7 +23,7 @@
     "vine_whip": {
         "name": "Látigo Cepa",
         "type": "grass",
-        "power": 45,
+        "power": 65,
         "accuracy": 100,
         "pp": 25
     },

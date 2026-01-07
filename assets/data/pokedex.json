@@ -15,7 +15,7 @@
         "base_hp": 55,
         "base_attack": 55,
         "base_defense": 50,
-        "moves": ["tackle", "quick_attack"],
+        "moves": ["tackle", "quick_attack","slam"],
         "sprite_front": "eevee.png",
         "sprite_back": "eevee.png"
     },

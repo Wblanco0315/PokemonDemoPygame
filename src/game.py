@@ -33,6 +33,7 @@ class Game:
         lider_gimnasio = Roark(9, 5)
         self.all_sprites.add(lider_gimnasio)
         self.npcs.add(lider_gimnasio)
+        self.roark_team = []
 
         self.menu_manager = MenuManager(self.player)
 
@@ -40,15 +41,22 @@ class Game:
         self.map_manager.walls.append(lider_gimnasio.rect)
 
         team_ids = ["bulbasaur", "eevee", "rattata"]
-
+        roark_team_ids = ["geodude", "onix","diglett"]
         for p_id in team_ids:
             p_data = self.data_manager.get_pokemon_data(p_id)
             if p_data:
                 # Creamos el Pokemon
-                new_poke = Pokemon(p_id, p_data, self.data_manager.moves, level=5)
+                new_poke = Pokemon(p_id, p_data, self.data_manager.moves, level=10)
                 # Lo añadimos a la mochila
                 self.player.add_pokemon(new_poke)
                 print(f"DEBUG: {new_poke.name} añadido.")
+
+        for p_id in roark_team_ids:
+            p_data = self.data_manager.get_pokemon_data(p_id)
+            if p_data:
+                new_poke = Pokemon(p_id, p_data, self.data_manager.moves, level=12)
+                self.roark_team.append(new_poke)
+                print(f"DEBUG: Roark obtuvo a {new_poke.name}")
 
     def update(self):
         if self.battle_manager.active:
@@ -124,29 +132,29 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
 
+                if self.battle_manager.active:
+                    self.battle_manager.handle_input(event)
+                    continue
+
                 if self.menu_manager.active:
                     if event.type == pygame.KEYDOWN:
                         self.menu_manager.handle_input(event)
                     continue
 
                 if event.type == pygame.KEYDOWN:
-
                     if event.key == pygame.K_RETURN:
-
-                        if not self.battle_manager.active and not self.dialogue_manager.active:
+                        if not self.dialogue_manager.active:
                             self.menu_manager.open_menu()
 
                     if event.key == pygame.K_z:
                         self.check_interaction()
 
                     if event.key == pygame.K_b:
-                        enemy = self.npcs.sprites()[0]
-                        self.battle_manager.start_battle(enemy)
+                        self.battle_manager.start_battle(self.player.team, self.roark_team)
 
             self.update()
             self.draw()
             self.clock.tick(FPS)
-            # -----------------------------------
 
         pygame.quit()
         sys.exit()
